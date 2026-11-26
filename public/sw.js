@@ -17,7 +17,7 @@ const HORS_LIGNE = "<!doctype html><meta charset=utf-8><meta name=viewport conte
 async function swr(req) {
   const c = await caches.open(CACHE);
   const cached = await c.match(req);
-  const reseau = fetch(req).then((r) => { if (r.ok) c.put(req, r.clone()); return r; }).catch(() => null);
+  const reseau = fetch(req).then((r) => { if (r.ok && r.type === "basic") c.put(req, r.clone()).catch(() => {}); return r; }).catch(() => null);
   return cached || (await reseau) || Response.error();
 }
 
@@ -26,7 +26,7 @@ self.addEventListener("fetch", (e) => {
   if (req.method !== "GET" || url.origin !== location.origin) return;
   if (req.mode === "navigate") {
     // Pages : réseau d'abord (contenu à jour), sinon l'application en cache, sinon page hors ligne.
-    e.respondWith(fetch(req).then((r) => { const copy = r.clone(); caches.open(CACHE).then((c) => c.put("/", copy)); return r; })
+    e.respondWith(fetch(req).then((r) => { if (r.ok && r.type === "basic") { const copy = r.clone(); caches.open(CACHE).then((c) => c.put("/", copy)).catch(() => {}); } return r; })
       .catch(() => caches.match("/").then((m) => m || new Response(HORS_LIGNE, { status: 503, headers: { "Content-Type": "text/html; charset=utf-8" } }))));
     return;
   }

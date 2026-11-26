@@ -224,9 +224,43 @@ a:focus-visible, .terme:focus-visible, .tuile:focus-visible, .seg:focus-visible,
 /* Impression : on n'imprime que le récapitulatif ou le document, sans barre ni boutons */
 @media print {
   body { background: #fff; color: #000; }
-  .side, .skip, .tabs, .no-print, .popover, .page > section > *:not(.print-zone), .bandeau { display: none !important; }
+  .side, .skip, .tabs, .no-print, .popover, .page > section > *:not(.print-zone):not(:has(.resultat)), .bandeau { display: none !important; }
   .page { margin: 0; padding: 0; animation: none; } .app { display: block; max-width: none; padding: 0; }
   section { box-shadow: none; border: 0; padding: 0; display: block; }
   .print-zone { display: block !important; white-space: pre-wrap; font: 12pt/1.5 Georgia, "Times New Roman", serif; margin: 0; }
   .avertissement { color: #000; font-size: 9pt; margin-top: 24px; }
+}
+
+/* Onglets : petits écrans (320-400 px) — libellés courts, pas de débordement, cibles >= 44 px */
+.tabs { overflow: hidden; }
+.tabs button span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tabs button .court { display: none; }
+@media (max-width: 400px) {
+  .tabs { width: calc(100% - 12px); padding: 4px 3px; border-radius: 18px; bottom: 6px; }
+  .tabs button { min-height: 56px; min-width: 44px; padding-inline: 0; }
+  .tabs button .long { display: none; } .tabs button .court { display: inline; }
+  .tabs button span { font-size: .66rem; }
+}
+@media (min-width: 1040px) { .tabs button .long { display: inline; } .tabs button .court { display: none; } }
+html, body { overflow-x: hidden; }
+
+/* Délai de prescription et étapes regroupées */
+.delai { margin: 10px 0; padding: 10px 14px; border-radius: 12px; border: 2px solid #b45309; background: color-mix(in srgb, #f59e0b 14%, var(--carte)); }
+.delai p { margin: 4px 0; } .delai .enbref-tag { color: #92400e; }
+@media (prefers-color-scheme: dark) { .delai .enbref-tag { color: #fcd34d; } }
+.sous-liste { margin: 6px 0 0; padding-left: 18px; font-size: .92rem; } .sous-liste li { margin: 3px 0; }
+
+/* Impression du résultat (diagnostic ou synthèse) : seule la fiche est imprimée, déroulée */
+@media print {
+  .page > section > .resultat { display: block !important; }
+  .resultat .actions, .resultat .btn, .resultat .compteur, .resultat input[type="checkbox"], .resultat .barre-actions { display: none !important; }
+  .resultat details > summary { display: none; }
+  .cases li, .enbref, .delai { break-inside: avoid; border-color: #000 !important; background: #fff !important; }
+  .cases label { padding-left: 12px; }
+  .resultat { color: #000; }
+}
+@media print {
+  .page > section > :has(.resultat) > *:not(:has(.resultat)):not(.resultat) { display: none !important; }
+  .page > section > :has(.resultat) { display: block !important; }
+  .page > section > :has(.resultat) .resultat { display: block; }
 }

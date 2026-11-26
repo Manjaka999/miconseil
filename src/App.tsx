@@ -11,13 +11,13 @@ const Simulateur = lazy(() => import("./components/Simulateur"));
 const Documents = lazy(() => import("./components/Documents"));
 const Lexique = lazy(() => import("./components/Lexique"));
 
-const onglets: { id: Onglet; label: string; Icon: typeof Home }[] = [
-  { id: "accueil", label: "Accueil", Icon: Home },
-  { id: "diagnostic", label: "Diagnostic", Icon: Compass },
-  { id: "recherche", label: "Articles", Icon: Library },
-  { id: "simulateur", label: "Simuler", Icon: Calculator },
-  { id: "documents", label: "Documents", Icon: FileText },
-  { id: "lexique", label: "Lexique", Icon: BookA },
+const onglets: { id: Onglet; label: string; court: string; Icon: typeof Home }[] = [
+  { id: "accueil", label: "Accueil", court: "Accueil", Icon: Home },
+  { id: "diagnostic", label: "Diagnostic", court: "Mon cas", Icon: Compass },
+  { id: "recherche", label: "Articles", court: "Articles", Icon: Library },
+  { id: "simulateur", label: "Simuler", court: "Calcul", Icon: Calculator },
+  { id: "documents", label: "Documents", court: "Lettres", Icon: FileText },
+  { id: "lexique", label: "Lexique", court: "Mots", Icon: BookA },
 ];
 
 export default function App() {
@@ -43,10 +43,10 @@ export default function App() {
           </header>
           <nav className={"tabs" + (index < 0 ? " sans-actif" : "")} aria-label="Navigation principale" style={{ ["--i" as string]: Math.max(index, 0), ["--n" as string]: onglets.length }}>
             <span className="indicateur" aria-hidden />
-            {onglets.map(({ id, label, Icon }) => (
-              <button key={id} className={id === onglet ? "on" : ""} onClick={() => aller({ onglet: id })} aria-current={id === onglet ? "page" : undefined}>
+            {onglets.map(({ id, label, court, Icon }) => (
+              <button key={id} className={id === onglet ? "on" : ""} onClick={() => aller({ onglet: id })} aria-current={id === onglet ? "page" : undefined} aria-label={label}>
                 <Icon size={22} strokeWidth={id === onglet ? 2.4 : 1.9} aria-hidden />
-                <span>{label}</span>
+                <span aria-hidden><span className="long">{label}</span><span className="court">{court}</span></span>
               </button>
             ))}
           </nav>

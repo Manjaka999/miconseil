@@ -25,7 +25,7 @@ export interface Article {
 export type Profil = "employeur" | "salarie";
 export type Contrat = "cdi" | "cdd" | "essai";
 export type SituationId =
-  | "licencier" | "eco" | "cdd_rupture" | "demission" | "demission_forcee" | "preavis" | "absence" | "essai" | "cdd_requalif"
+  | "licencier" | "eco" | "cdd_rupture" | "demission" | "demission_forcee" | "statut_impose" | "convocation_surprise" | "preavis" | "absence" | "essai" | "cdd_requalif"
   | "maladie_licenciement" | "enceinte" | "accident" | "maladie_certif" | "harcelement"
   | "harcelement_sexuel" | "paternite" | "teletravail" | "modification_contrat" | "chomage_technique" | "droit_retrait" | "greve" | "saisir_inspection"
   | "retard_salaire" | "salaire_minimum" | "heures_sup" | "duree_repos" | "feries"
@@ -53,6 +53,10 @@ export interface Diagnostic {
   verdict: "conforme" | "risque" | "illegal" | "info";
   titre: string;
   explication: string;
+  /** En bref en langage courant (2 phrases au plus). */
+  bref?: string;
+  /** Delai de prescription a mettre en evidence. */
+  delai?: string;
   articles: string[]; // ids d'articles
   conseil: string;
   /** Prochaines étapes concrètes, dans l'ordre. */

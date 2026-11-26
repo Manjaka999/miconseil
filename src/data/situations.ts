@@ -19,12 +19,16 @@ export const situations: SituationDef[] = [
   },
   { id: "cdd_rupture", theme: "rupture", label: "Rupture ou fin d'un CDD", motsCles: ["terme", "fin de contrat", "non renouvellement", "contrat déterminé"] },
   { id: "demission", theme: "rupture", label: "Démission", motsCles: ["partir", "quitter", "démissionner", "lettre de démission"] },
-  { id: "demission_forcee", theme: "rupture", label: "On me pousse à démissionner", motsCles: ["forcée", "pression", "obligé", "signer", "rupture amiable", "accord"] },
+  { id: "demission_forcee", theme: "rupture", label: "On me pousse à démissionner", motsCles: ["forcée", "pression", "obligé", "signer", "rupture amiable", "accord", "prestataire", "facture", "indépendant", "freelance", "convoqué", "choix imposé"] },
+  { id: "statut_impose", theme: "rupture", label: "On m'impose un autre statut (prestataire, indépendant) ou de démissionner", motsCles: ["prestataire", "indépendant", "freelance", "auto-entrepreneur", "facture", "faux indépendant", "changer de statut", "contrat de prestation", "démission imposée", "signer une démission", "subordination"] },
   { id: "preavis", theme: "rupture", label: "Préavis non respecté ou non payé", motsCles: ["délai de prévenance", "sans préavis", "indemnité de préavis"] },
   { id: "essai", theme: "rupture", label: "Période d'essai (durée, rupture)", motsCles: ["essai", "renouveler l'essai", "stage", "rupture d'essai"], questions: [{ id: "ecrit", label: "L'essai est-il prévu par écrit (poste, durée, salaire, catégorie) ?", options: [oui, non, nsp] }] },
   { id: "certificat", theme: "rupture", label: "Certificat de travail / solde de tout compte non remis", motsCles: ["attestation", "documents de fin de contrat", "solde", "papiers", "reçu pour solde"] },
 
-  { id: "retard_salaire", theme: "salaire", label: "Retard ou non-paiement du salaire", motsCles: ["impayé", "salaire en retard", "pas payé", "paie"] },
+  {
+    id: "retard_salaire", theme: "salaire", label: "Retard ou non-paiement du salaire", motsCles: ["impayé", "salaire en retard", "pas payé", "paie", "mois sans salaire", "payé en retard"],
+    questions: [{ id: "duree", label: "Depuis combien de temps le salaire est-il en retard ?", options: [{ v: "moins1", label: "Moins d'1 mois" }, { v: "1a2", label: "1 à 2 mois" }, { v: "plus2", label: "Plus de 2 mois" }, { v: "repete", label: "Plusieurs fois (retards répétés)" }] }],
+  },
   { id: "salaire_minimum", theme: "salaire", label: "Salaire inférieur au minimum", motsCles: ["SME", "smig", "trop bas", "salaire minimum", "égalité de salaire"] },
   {
     id: "heures_sup", theme: "salaire", label: "Heures supplémentaires non payées", motsCles: ["heures sup", "majoration", "dépassement", "travail en plus", "week-end"],

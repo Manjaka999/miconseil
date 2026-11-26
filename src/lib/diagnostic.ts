@@ -1,3 +1,4 @@
+import { bref } from "./bref";
 import type { Contrat, Diagnostic, ModeleId, Profil, SituationId } from "../types";
 
 /** Ancienneté en mois (-1 = inconnue). `reponses` : réponses aux questions complémentaires (voir data/situations.ts). */
@@ -14,13 +15,13 @@ const L = (...n: number[]) => n.map((x) => "l24-" + x);
  * Quand le Code renvoie à un décret, à un arrêté ou à une convention collective, le résultat le dit (champ « nonPrecise ») : aucune règle inventée.
  * Date d'entrée en vigueur : non précisée par le texte (voir BandeauLoi). Orientation générale, pas un avis juridique.
  */
-export function diagnostiquer(s: Situation): Diagnostic {
+function calcul(s: Situation): Diagnostic {
   const emp = s.profil === "employeur";
   const r = s.reponses;
   switch (s.situation) {
     case "licencier":
-      if (s.contrat === "essai") return diagnostiquer({ ...s, situation: "essai" });
-      if (s.contrat === "cdd") return diagnostiquer({ ...s, situation: "cdd_rupture" });
+      if (s.contrat === "essai") return calcul({ ...s, situation: "essai" });
+      if (s.contrat === "cdd") return calcul({ ...s, situation: "cdd_rupture" });
       return fin({
         verdict: "risque", titre: "Licenciement d'un salarié en CDI",
         explication: "Avant tout licenciement, l'employeur informe le salarié par écrit des motifs et le convoque à un entretien préalable, par écrit probant, au moins 3 jours ouvrables à l'avance ; le salarié peut se faire assister par une personne de son choix et obtenir le dossier des faits reprochés (art. 42). S'il refuse la convocation ou ne vient pas sans motif sérieux, il est réputé renoncer à sa défense (art. 42). Le licenciement est ensuite notifié par écrit avec ses motifs ; aucun nouveau motif ne peut être ajouté après la notification (art. 41). Il ouvre droit au solde de salaire, à l'indemnité de congés non pris, au préavis (sauf faute lourde) et au certificat de travail, à payer dès la cessation du travail (art. 42). Un licenciement sans motif légitime ou sans respecter la procédure est abusif, et c'est à celui qui rompt de prouver que sa décision est légitime (art. 39). L'employeur conserve les documents du licenciement au moins 5 ans (art. 42). Attention aux protections cumulables : pas de licenciement pendant la suspension du contrat pour maladie constatée ou accident du travail (art. 31), ni pour une salariée dont la grossesse est constatée (art. 140) ; le licenciement d'un délégué du personnel doit être soumis à l'inspecteur du travail (art. 221) ; un licenciement lié à un harcèlement est imputable à son auteur (art. 40). Si l'un de ces cas vous concerne, consultez aussi la situation correspondante.",
@@ -82,12 +83,38 @@ export function diagnostiquer(s: Situation): Diagnostic {
     case "demission_forcee":
       return fin({
         verdict: emp ? "risque" : "info", titre: "Pression pour démissionner",
-        explication: "Une démission est notifiée par écrit et doit indiquer le motif (art. 41 et 43). Une rupture imposée peut être jugée abusive : le juge apprécie et c'est à l'auteur de la rupture de prouver qu'elle est légitime (art. 39). Un accord ou une transaction ne peut pas faire renoncer le salarié à ses droits légaux (art. 96). Si l'employeur modifie unilatéralement et moins favorablement la classification, la rémunération ou le poste et que le salarié écrit qu'il prend acte de la rupture, celle-ci est imputée à l'employeur (art. 29). Si la pression est un harcèlement, la rupture est imputable à son auteur (art. 40).",
-        articles: L(41, 43, 39, 96, 29, 40),
+        explication: "Une démission est notifiée par écrit et doit indiquer le motif (art. 41 et 43). Une rupture imposée peut être jugée abusive : le juge apprécie et c'est à l'auteur de la rupture de prouver qu'elle est légitime (art. 39). Un accord ou une transaction ne peut pas faire renoncer le salarié à ses droits légaux (art. 96). Si l'employeur modifie unilatéralement et moins favorablement la classification, la rémunération ou le poste et que le salarié écrit qu'il prend acte de la rupture, celle-ci est imputée à l'employeur (art. 29). Si la pression est un harcèlement, la rupture est imputable à son auteur (art. 40). Si on vous propose de continuer comme « prestataire » : le Code définit le travailleur comme la personne qui met son activité professionnelle, contre rémunération, sous la direction et l'autorité d'une autre (art. 2), et ne s'applique pas aux travailleurs indépendants (art. 1) ; aucune convention ne peut vous faire renoncer à vos droits (art. 96).",
+        articles: L(41, 43, 39, 96, 29, 40, 2, 1),
         conseil: emp ? "Évitez toute pression : si vous voulez mettre fin au contrat, utilisez la procédure de licenciement ou un accord écrit et libre." : "Ne signez rien sous pression. Notez dates, paroles et messages, et demandez toute décision de l'employeur par écrit.",
         etapes: emp ? ["Renoncez à toute pression orale.", "Choisissez la voie régulière : licenciement avec procédure (modèle « Convocation ») ou accord écrit."] : ["Ne signez pas de démission ni de « solde de tout compte » sous pression.", "Gardez les preuves (messages, témoins, dates).", "Écrivez à l'employeur pour contester (modèle « Contestation »).", "Saisissez l'inspection du travail si cela continue."],
         documents: emp ? ["convocation"] : ["contestation"],
-        nonPrecise: "Le Code n'emploie pas le terme « démission forcée » : c'est le juge qui qualifie les faits (art. 39).",
+        nonPrecise: "Le Code n'emploie pas le terme « démission forcée » et ne traite pas expressément du passage de salarié à « prestataire » : c'est le juge qui qualifie les faits (art. 39).",
+      });
+
+    case "statut_impose":
+      return fin({
+        verdict: "risque", titre: "Changement de statut imposé (prestataire, indépendant) ou démission imposée",
+        explication: "Le Code définit le travailleur comme toute personne qui s'engage à mettre son activité professionnelle, moyennant rémunération, sous la direction et l'autorité d'une autre personne ; il vise aussi les personnes qui exécutent habituellement pour le compte et sous l'autorité d'une autre personne le travail par elles-mêmes, quels que soient le mode de rémunération et la durée de travail (art. 2). Il ne s'applique pas aux travailleurs indépendants (art. 1). Aucune convention ou transaction ne peut valoir renonciation du travailleur aux droits qu'il tient de son contrat, de la convention collective et de la loi (art. 96). Une démission est notifiée par écrit avec ses motifs (art. 41 et 43). Une rupture imposée peut être abusive ; c'est à son auteur d'établir qu'elle est légitime, le juge appréciant (art. 39). Un licenciement doit respecter la procédure de défense (art. 42). La saisine de l'inspection du travail est obligatoire avant le tribunal pour un travailleur encore sous contrat (art. 263).",
+        articles: L(2, 1, 96, 39, 41, 43, 42, 29, 263, 262),
+        conseil: emp ? "Ne changez pas le statut d'un travailleur qui travaille sous votre direction et votre autorité : l'art. 2 le définit par cette subordination. Si vous voulez mettre fin au contrat, suivez la procédure de licenciement ou un accord écrit et libre." : "Ne signez rien tout de suite et gardez les preuves de votre situation de travail (horaires, ordres, outils, lieu). La qualification (salarié ou indépendant) relève de l'inspecteur du travail ou du juge, pas de l'étiquette posée sur le contrat.",
+        etapes: emp
+          ? ["Vérifiez si la personne travaille sous votre direction et votre autorité (art. 2) : si oui, elle relève du Code.", "Ne lui faites signer aucune renonciation à ses droits (art. 96).", "Pour mettre fin au contrat, utilisez la procédure de licenciement (modèle « Convocation ») ou un accord écrit et libre (art. 42)."]
+          : ["Ne signez rien (contrat de prestation, démission, accord, reçu pour solde) avant d'avoir demandé un délai et un écrit.", "Gardez les preuves de subordination : horaires imposés, ordres et consignes (messages, e-mails), outils et matériel fournis, lieu de travail, personne qui contrôle votre travail, bulletins de paie ou paiements reçus.", "Demandez à l'employeur de confirmer par écrit sa décision et ses motifs (art. 41).", "Écrivez pour contester le changement de statut ou la démission demandée (modèle « Contestation »).", "Saisissez l'inspection du travail : elle est obligatoire avant le tribunal tant que vous êtes sous contrat (art. 263)."],
+        documents: emp ? ["convocation"] : ["contestation"],
+        nonPrecise: "Le Code ne traite pas expressément du passage d'un salarié au statut de « prestataire » ni de la démission imposée, et ne liste pas les critères qui distinguent un indépendant d'un travailleur : c'est l'inspecteur du travail ou le juge qui qualifie les faits. Aucun délai pour contester cette qualification n'est précisé. " + INSPECTION,
+      });
+
+    case "convocation_surprise":
+      return fin({
+        verdict: "risque", titre: "Entretien imposé sans information préalable",
+        explication: "Quand l'employeur envisage un licenciement, il doit informer le travailleur par écrit des motifs et le convoquer à un entretien préalable par tout écrit probant, au moins 3 jours ouvrables à l'avance ; le dossier des faits est communiqué sur demande et le travailleur peut se faire assister par une personne de son choix. S'il refuse de recevoir la convocation ou ne se présente pas sans motif sérieux, il est réputé avoir renoncé à son droit de défense ; l'employeur garde les documents au moins 5 ans (art. 42). Un licenciement non conforme aux procédures est particulièrement abusif (art. 39). Pour une sanction autre que le licenciement, le règlement intérieur fixe les garanties de la défense et les délais (art. 234 et 239). Aucune convention ou transaction ne vaut renonciation aux droits du travailleur (art. 96).",
+        articles: L(42, 39, 41, 234, 239, 96, 262, 263),
+        conseil: emp ? "Convoquez toujours par écrit probant, au moins 3 jours ouvrables avant, en indiquant les motifs ; gardez la preuve de la remise." : "Mieux vaut vous présenter ou prévenir par écrit avec un motif sérieux, car l'absence peut vous faire perdre votre droit de défense. Ne signez rien sur place.",
+        etapes: emp
+          ? ["Informez le travailleur par écrit des motifs envisagés et convoquez-le par écrit probant, au moins 3 jours ouvrables à l'avance (modèle « Convocation »).", "Communiquez-lui le dossier des faits s'il le demande et laissez-le se faire assister.", "Conservez les documents de la procédure au moins 5 ans (art. 42)."]
+          : ["Ne signez rien sur place (accord, démission, reconnaissance des faits, reçu).", "Notez la date, l'heure, le lieu, les personnes présentes et ce qui est dit.", "Demandez par écrit les motifs de l'entretien, le dossier des faits reprochés et un délai d'au moins 3 jours ouvrables pour préparer votre défense (art. 42).", "Demandez à être assisté par une personne de votre choix.", "Écrivez ensuite à l'employeur pour contester la procédure si elle n'a pas été respectée (modèle « Contestation »).", "Saisissez l'inspection du travail si la pression continue (art. 263)."],
+        documents: emp ? ["convocation"] : ["contestation"],
+        nonPrecise: "L'art. 42 vise le licenciement. Le Code ne dit pas expressément ce qu'il advient d'un entretien tenu le jour même, ni que le travailleur peut refuser d'y assister, ni la valeur d'une signature donnée sur place : c'est l'inspecteur du travail ou le juge qui apprécie. " + INSPECTION,
       });
 
     case "preavis":
@@ -135,16 +162,28 @@ export function diagnostiquer(s: Situation): Diagnostic {
         documents: emp ? [] : ["demande_certificat", "mise_en_demeure"],
       });
 
-    case "retard_salaire":
+    case "retard_salaire": {
+      const du = r.duree ?? "moins1";
+      const dur = ({ moins1: "moins d'un mois", "1a2": "1 à 2 mois", plus2: "plus de 2 mois", repete: "plusieurs fois" } as Record<string, string>)[du] ?? "moins d'un mois";
+      const grave = du !== "moins1";
+      const preuves = "Gardez les preuves : bulletins de paie (art. 95), relevés bancaires ou reçus montrant les dates réelles de paiement, messages de l'employeur sur le retard.";
+      const reserve = "Si on vous fait signer un bulletin ou un reçu, ajoutez « sous toutes réserves » : l'acceptation sans réserve ne vaut pas renonciation à votre salaire (art. 95). Ne signez aucun papier qui renonce à vos droits (art. 96).";
+      const delaiTxt = "Le droit de réclamer les salaires se prescrit par 12 mois (art. 105). Le Code ne précise pas à partir de quand ces 12 mois courent : n'attendez pas.";
       return fin({
-        verdict: emp ? "illegal" : "info", titre: "Retard de paiement du salaire",
-        explication: "Le salaire est payé à intervalles réguliers (jour, semaine, quinzaine ou mois). Les retards doivent être justifiés par la force majeure ; même alors, le salaire doit être payé au plus tard le 8e jour pour un salaire à la journée ou à la semaine, le 20e jour pour une quinzaine, et 8 jours après l'échéance mensuelle pour un salaire mensuel. Tout retard non justifié donne lieu à majoration au taux d'intérêt légal, sans préjudice des sanctions pénales (art. 94). Le paiement est constaté par un bulletin de paie (art. 95). L'action en paiement se prescrit par 12 mois (art. 105). Tant que le contrat est en cours, la saisine de l'inspection du travail est obligatoire avant le tribunal (art. 263) ; l'inspecteur peut ordonner le paiement d'un salaire dû (art. 271).",
-        articles: L(94, 95, 105, 263, 271, 369),
-        conseil: emp ? "Régularisez vite et gardez la preuve du paiement et du bulletin." : "Réclamez par écrit, puis saisissez l'inspecteur du travail sans attendre 12 mois.",
-        etapes: emp ? ["Payez les mois dus avec la majoration au taux d'intérêt légal.", "Remettez les bulletins de paie."] : ["Listez les mois impayés et les montants.", "Envoyez une mise en demeure écrite (modèle « Mise en demeure »).", "Saisissez l'inspecteur du travail si rien ne change.", "Agissez dans les 12 mois."],
+        verdict: grave ? "illegal" : emp ? "risque" : "info", titre: "Retard de paiement du salaire (" + dur + ")",
+        explication: "Le salaire est payé à intervalles réguliers (jour, semaine, quinzaine ou mois). Les retards doivent être justifiés par la force majeure ; même alors, le salaire doit être payé au plus tard le 8e jour pour un salaire à la journée ou à la semaine, le 20e jour pour une quinzaine, et 8 jours après l'échéance mensuelle pour un salaire mensuel. Un retard d'un mois ou plus dépasse donc ces limites. Tout retard non justifié donne lieu à majoration au taux d'intérêt légal, sans préjudice des sanctions pénales (art. 94). Le paiement est constaté par un bulletin de paie (art. 95). L'action en paiement se prescrit par 12 mois (art. 105). Tant que le contrat est en cours, la saisine de l'inspection du travail est obligatoire avant le tribunal (art. 263) ; l'inspecteur peut ordonner le paiement d'un salaire dû (art. 271).",
+        articles: L(94, 95, 96, 105, 263, 271, 369),
+        conseil: emp ? "Régularisez vite et gardez la preuve du paiement et du bulletin." : grave ? "Réclamez par écrit sans attendre et saisissez l'inspecteur du travail ; ne dépassez pas 12 mois." : "Rappelez la date prévue à l'employeur par écrit et gardez vos preuves ; passez à la mise en demeure si le retard continue.",
+        etapes: emp
+          ? [grave ? "Payez sans attendre les mois dus, avec la majoration au taux d'intérêt légal (art. 94)." : "Payez le salaire dû ; si le retard n'est pas justifié par la force majeure, ajoutez la majoration au taux d'intérêt légal (art. 94).", "Remettez les bulletins de paie (art. 95).", "Gardez la preuve du paiement (relevé bancaire ou reçu).", ...(grave ? ["Présentez-vous à la convocation de l'inspection du travail si vous en recevez une (art. 263)."] : [])]
+          : du === "moins1"
+            ? ["Comparez la date de paiement avec la date prévue : au plus tard le 8e jour (salaire à la journée ou à la semaine), le 20e jour (quinzaine) ou 8 jours après l'échéance (mois), même en cas de force majeure (art. 94).", preuves, "Rappelez par écrit à l'employeur la date prévue et demandez le paiement.", reserve, "Envoyez une mise en demeure écrite (modèle « Mise en demeure ») si le retard continue."]
+            : [preuves, "Listez les mois impayés, les montants et les dates prévues de paiement.", "Envoyez une mise en demeure écrite (modèle « Mise en demeure »).", du === "1a2" ? "Saisissez l'inspecteur du travail si le salaire n'est pas payé après la mise en demeure : c'est obligatoire avant le tribunal tant que le contrat est en cours (art. 263)." : "Saisissez l'inspecteur du travail sans attendre longtemps après la mise en demeure : il peut ordonner le paiement du salaire dû (art. 263 et 271).", reserve, "Agissez dans les 12 mois (art. 105)."],
         documents: emp ? [] : ["mise_en_demeure"],
-        nonPrecise: "Le taux d'intérêt légal n'est pas indiqué dans le Code du travail. Un arrêté du Ministre du Travail fixe les formes et modalités de paiement du salaire (art. 94).",
+        delai: delaiTxt,
+        nonPrecise: "Le taux d'intérêt légal n'est pas indiqué dans le Code du travail. Un arrêté du Ministre du Travail fixe les formes et modalités de paiement du salaire (art. 94)." + (du === "repete" ? " Le Code ne précise pas la conséquence de retards répétés (par exemple le droit de rompre le contrat aux torts de l'employeur) : demandez à l'inspection du travail." : " Le Code ne précise pas non plus si un retard de salaire permet à lui seul de rompre le contrat aux torts de l'employeur.") + " Le point de départ des 12 mois n'est pas précisé.",
       });
+    }
 
     case "salaire_minimum":
       return fin({
@@ -415,4 +454,12 @@ export function diagnostiquer(s: Situation): Diagnostic {
         nonPrecise: "La composition et la procédure du tribunal du travail sont fixées par des textes à part (art. 273). Le Code ne chiffre pas les frais éventuels d'une procédure judiciaire.",
       });
   }
+}
+
+/** Diagnostic complet : calcul des règles puis « En bref » en langage courant (voir bref.ts). */
+export function diagnostiquer(s: Situation): Diagnostic {
+  const d = calcul(s);
+  const sid = s.situation === "licencier" ? (s.contrat === "essai" ? "essai" : s.contrat === "cdd" ? "cdd_rupture" : "licencier") : s.situation;
+  const b = bref(sid, s.profil, s.reponses);
+  return b ? { ...d, bref: b } : d;
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { BadgeCheck, BookOpen, Calculator, CircleAlert, FilePenLine, Info, ListChecks, ShieldCheck, TriangleAlert, Zap } from "lucide-react";
+import { BadgeCheck, BookOpen, Calculator, CalendarClock, CircleAlert, FilePenLine, Printer, Info, ListChecks, ShieldCheck, TriangleAlert, Zap } from "lucide-react";
 import type { Diagnostic, ModeleId, SituationId } from "../types";
 import { articleParId, libelleArticle } from "../data/articles";
 import { situations } from "../data/situations";
@@ -17,7 +17,7 @@ const AVEC_SIMU: SituationId[] = ["licencier", "eco", "cdd_rupture", "demission"
 interface PropsCommunes { onDocuments: (m?: ModeleId) => void; onArticle: (id: string) => void; onSimulateur: () => void }
 
 /** Étapes numérotées avec cases à cocher conservées sur l'appareil. */
-export function Plan({ etapes }: { etapes: { texte: string; sids?: SituationId[] }[] }) {
+export function Plan({ etapes }: { etapes: { texte: string; sids?: SituationId[]; liste?: string[] }[] }) {
   const [{ faits }, set] = useCases();
   const segs = useAnnote(etapes.map((e) => e.texte));
   const n = etapes.filter((e) => faits[cleEtape(e.texte)]).length;
@@ -33,6 +33,7 @@ export function Plan({ etapes }: { etapes: { texte: string; sids?: SituationId[]
               <label htmlFor={id}>
                 <span className="num" aria-hidden>{i + 1}</span>
                 <span><span className="sr">Étape {i + 1} : </span><Segments segs={segs[i]} />
+                  {e.liste && <ul className="sous-liste">{e.liste.map((x) => <li key={x}>{x}</li>)}</ul>}
                   {e.sids && e.sids.length > 0 && <span className="etiquettes">{e.sids.map((s) => <small key={s} className="etiquette">{labelSit(s)}</small>)}</span>}
                 </span>
               </label>
@@ -63,6 +64,17 @@ function Boutons({ documents, sids, onDocuments, onSimulateur }: { documents: Mo
   );
 }
 
+function Delai({ textes }: { textes: string[] }) {
+  if (textes.length === 0) return null;
+  return <div className="delai" role="note"><p className="enbref-tag"><CalendarClock size={16} aria-hidden /> Délai à ne pas dépasser</p>{textes.map((x) => <p key={x}>{x}</p>)}</div>;
+}
+
+/** Imprime le résultat : les parties repliées sont d'abord dépliées pour apparaître sur la feuille. */
+function Imprimer() {
+  const go = () => { document.querySelectorAll<HTMLDetailsElement>("details.detail").forEach((d) => { d.open = true; }); window.print(); };
+  return <button className="btn sec no-print" onClick={go}><Printer size={18} aria-hidden /> Imprimer ou enregistrer en PDF</button>;
+}
+
 function EnBrefCarte({ verdict, phrase, actions, titre }: { verdict: Verdict; phrase: string; actions: string[]; titre: string }) {
   const titreRef = useFocusTitre();
   const Icone = icones[verdict];
@@ -87,6 +99,7 @@ export function Resultat({ d, sid, hypothese, ...p }: { d: Diagnostic; sid: Situ
     <div className={"resultat " + d.verdict}>
       <EnBrefCarte verdict={d.verdict} phrase={phrase} actions={b.actions} titre={d.titre} />
       {hypothese && <p className="muted hypothese" role="note"><Info size={14} aria-hidden /> {hypothese}</p>}
+      <Delai textes={d.delai ? [d.delai] : []} />
       <Plan etapes={d.etapes.map((texte) => ({ texte }))} />
       <details className="detail">
         <summary>Voir le détail : explication, articles, points non précisés</summary>
@@ -96,6 +109,7 @@ export function Resultat({ d, sid, hypothese, ...p }: { d: Diagnostic; sid: Situ
         {d.nonPrecise && <p className="muted"><strong>Non précisé par le Code :</strong> {d.nonPrecise}</p>}
       </details>
       <Boutons documents={d.documents} sids={[sid]} onDocuments={p.onDocuments} onSimulateur={p.onSimulateur} />
+      <Imprimer />
     </div>
   );
 }
@@ -114,7 +128,8 @@ export function SyntheseView({ s, hypothese, ...p }: { s: Synthese; hypothese?: 
         <ul className="maintenant">{s.actions[0] && <li><Segments segs={a0} /></li>}{s.actions[1] && <li><Segments segs={a1} /></li>}</ul>
       </div>
       {hypothese && <p className="muted hypothese" role="note"><Info size={14} aria-hidden /> {hypothese}</p>}
-      <Plan etapes={s.plan.map((e) => ({ texte: e.texte, sids: e.sids.length > 1 || s.points.length > 1 ? e.sids : undefined }))} />
+      <Delai textes={s.delais} />
+      <Plan etapes={s.plan.map((e) => ({ texte: e.texte, liste: e.liste, sids: e.sids.length > 1 || s.points.length > 1 ? e.sids : undefined }))} />
       <details className="detail">
         <summary>Voir le détail : points par situation, protections, articles</summary>
         <h4>Points par situation</h4>
@@ -129,6 +144,7 @@ export function SyntheseView({ s, hypothese, ...p }: { s: Synthese; hypothese?: 
       </details>
       {s.documents.length > 0 && <><h4>Documents à produire</h4></>}
       <Boutons documents={s.documents} sids={s.points.map((x) => x.sid)} onDocuments={p.onDocuments} onSimulateur={p.onSimulateur} />
+      <Imprimer />
     </div>
   );
 }
