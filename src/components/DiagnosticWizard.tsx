@@ -4,6 +4,7 @@ import type { Contrat, ModeleId, Profil, SituationDef, SituationId } from "../ty
 import { diagnostiquer } from "../lib/diagnostic";
 import { articleParId, libelleArticle } from "../data/articles";
 import { situations, themes } from "../data/situations";
+import BandeauLoi from "./BandeauLoi";
 
 const icones = { conforme: ShieldCheck, risque: TriangleAlert, illegal: CircleAlert, info: Info } as const;
 const verdictTexte = { conforme: "Situation en règle", risque: "Attention : risque", illegal: "Pratique contraire au Code", info: "Information" } as const;
@@ -48,6 +49,7 @@ export default function DiagnosticWizard({ onDocuments, onArticle }: Props) {
   return (
     <section>
       <h2><Compass size={22} aria-hidden /> Diagnostic de litige</h2>
+      <BandeauLoi />
       <div className="etapes" role="progressbar" aria-valuemin={1} aria-valuemax={total} aria-valuenow={Math.min(etape, total)} aria-label="Progression">
         {Array.from({ length: total }, (_, i) => <span key={i} className={etape >= i + 1 ? "fait" : ""} />)}
       </div>

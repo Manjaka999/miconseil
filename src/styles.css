@@ -131,3 +131,12 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .resultat ol { padding-left: 20px; margin: 4px 0; }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
 .actions { flex-wrap: wrap; }
+
+/* Loi appliquée : encart, onglets, badges */
+.bandeau { display: flex; gap: 10px; align-items: flex-start; background: color-mix(in srgb, var(--bleu-clair) 55%, var(--carte)); border: 1px solid var(--bord); border-left: 5px solid var(--bleu); border-radius: 12px; padding: 10px 14px; margin: 10px 0 14px; font-size: .9rem; }
+.bandeau > svg { flex: none; margin-top: 3px; color: var(--bleu); } .bandeau p { margin: 2px 0; }
+.onglets-loi { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); } .onglets-loi .choix { padding: 10px 12px; min-height: 44px; font-size: .9rem; }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; }
+.badge.loi { background: var(--bleu-clair); color: var(--bleu-fonce); } .badge.ancienne { background: #fee2e2; color: #991b1b; } .badge.theme { background: var(--bord); color: var(--txt); font-weight: 500; }
+.carte.ancien { border-left: 4px solid #f87171; }
+@media (prefers-color-scheme: dark) { .badge.loi { color: #bfdbfe; } .badge.ancienne { background: #4c1d1d; color: #fecaca; } }

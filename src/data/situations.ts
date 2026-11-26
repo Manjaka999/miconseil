@@ -48,10 +48,15 @@ export const situations: SituationDef[] = [
     id: "enceinte", theme: "sante", label: "Grossesse, maternité, allaitement", motsCles: ["enceinte", "grossesse", "maternité", "bébé", "accouchement", "allaiter"],
     questions: [{ id: "constat", label: "La grossesse est-elle constatée médicalement ?", options: [oui, non] }],
   },
+  { id: "paternite", theme: "sante", label: "Congé de paternité (naissance)", motsCles: ["père", "naissance", "paternité", "3 jours", "bébé"] },
+  { id: "droit_retrait", theme: "sante", label: "Danger au travail : droit d'alerte et de retrait", motsCles: ["danger", "retrait", "alerte", "péril", "machine", "incendie", "risque"] },
   { id: "accident", theme: "sante", label: "Accident du travail / sécurité au poste", motsCles: ["blessure", "blessé", "équipement", "protection", "danger", "maladie professionnelle"] },
   { id: "enfants", theme: "sante", label: "Travail des enfants et des mineurs", motsCles: ["mineur", "moins de 18 ans", "enfant", "apprenti", "15 ans"], questions: [{ id: "age", label: "Quel est l'âge de la personne ?", options: [{ v: "moins15", label: "Moins de 15 ans" }, { v: "15a17", label: "15 à 17 ans" }] }] },
 
-  { id: "harcelement", theme: "discipline", label: "Harcèlement ou discrimination", motsCles: ["harcèlement", "discrimination", "humiliation", "menaces", "sexuel", "moral", "égalité"] },
+  { id: "harcelement", theme: "discipline", label: "Harcèlement moral ou discrimination", motsCles: ["harcèlement", "discrimination", "humiliation", "menaces", "moral", "égalité", "violence"] },
+  { id: "harcelement_sexuel", theme: "discipline", label: "Harcèlement sexuel", motsCles: ["harcèlement sexuel", "avances", "chantage", "faveurs", "sexuel", "dignité"] },
+  { id: "greve", theme: "discipline", label: "Grève", motsCles: ["grève", "gréviste", "arrêt de travail collectif", "service minimum", "revendications"] },
+  { id: "saisir_inspection", theme: "discipline", label: "Saisir l'inspection du travail ou le tribunal", motsCles: ["inspecteur", "tribunal", "plainte", "conciliation", "litige", "recours", "procès-verbal"] },
   {
     id: "sanction", theme: "discipline", label: "Sanction disciplinaire / mise à pied", motsCles: ["avertissement", "blâme", "mise à pied", "punition", "règlement intérieur"],
     questions: [{ id: "reglement", label: "Existe-t-il un règlement intérieur écrit ?", options: [oui, non, nsp] }],
@@ -64,8 +69,10 @@ export const situations: SituationDef[] = [
   {
     id: "cdd_requalif", theme: "contrats", label: "CDD renouvelé plusieurs fois (devient-il un CDI ?)", motsCles: ["requalification", "renouvellement", "cdd à répétition", "enchaîner", "cdi"],
     questions: [
-      { id: "renouv", label: "Combien de fois le CDD a-t-il été renouvelé (ou le salarié réembauché au même poste en moins d'un mois) ?", options: [{ v: "0", label: "Jamais" }, { v: "1", label: "1 fois" }, { v: "2", label: "2 fois ou plus" }] },
-      { id: "six", label: "Le CDD dure-t-il au moins 6 mois ?", options: [oui, non] },
+      { id: "renouv", label: "Combien de fois le CDD a-t-il été renouvelé (ou le salarié réembauché au même poste après une interruption de 3 mois au plus) ?", options: [{ v: "0", label: "Jamais" }, { v: "1", label: "1 fois" }, { v: "2", label: "2 fois ou plus" }] },
     ],
   },
+  { id: "teletravail", theme: "contrats", label: "Télétravail (travail à distance)", motsCles: ["télétravail", "travail à distance", "domicile", "matériel", "épidémie", "internet"] },
+  { id: "modification_contrat", theme: "contrats", label: "Modification du contrat (salaire, poste, classification)", motsCles: ["baisse de salaire", "changement de poste", "rétrogradation", "avenant", "mutation", "prise d'acte"] },
+  { id: "chomage_technique", theme: "contrats", label: "Chômage technique", motsCles: ["arrêt d'activité", "panne", "sinistre", "pénurie", "mise en chômage", "suspension collective"] },
 ];

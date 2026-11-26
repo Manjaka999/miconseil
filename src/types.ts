@@ -1,5 +1,15 @@
+export type Loi = "2024-014" | "2003-044";
+
 export interface Article {
   id: string;
+  /** Loi d'origine : 2024-014 = Code du travail en vigueur ; 2003-044 = ancienne loi (abrogée en principe, art. 394 de la loi 2024-014). */
+  loi: Loi;
+  /** Thème de regroupement (Code 2024). */
+  theme?: string;
+  /** Référence de la source (loi, date, article). */
+  source?: string;
+  /** Id de l'article équivalent dans l'autre loi (même sujet, équivalence certaine). */
+  equivalent?: string;
   /** Numéro officiel. null = à confirmer dans le texte officiel. */
   numero: string | null;
   titre: string;
@@ -17,6 +27,7 @@ export type Contrat = "cdi" | "cdd" | "essai";
 export type SituationId =
   | "licencier" | "eco" | "cdd_rupture" | "demission" | "demission_forcee" | "preavis" | "absence" | "essai" | "cdd_requalif"
   | "maladie_licenciement" | "enceinte" | "accident" | "maladie_certif" | "harcelement"
+  | "harcelement_sexuel" | "paternite" | "teletravail" | "modification_contrat" | "chomage_technique" | "droit_retrait" | "greve" | "saisir_inspection"
   | "retard_salaire" | "salaire_minimum" | "heures_sup" | "duree_repos" | "feries"
   | "conges" | "certificat" | "sanction" | "delegue" | "enfants";
 
@@ -54,8 +65,8 @@ export interface Diagnostic {
 
 /** Hypothèses de calcul, modifiables par l'utilisateur. À valider sur le texte officiel / avec l'inspection du travail. */
 export interface Bareme {
-  /** Durée du préavis en mois : non fixée par le Code (art. 19), à saisir. */
+  /** Durée du préavis en mois : non fixée par le Code (art. 38 de la loi 2024-014), à saisir. */
   preavisMois: number;
-  /** Jours de salaire par année complète de service (art. 28 : 10). */
+  /** Jours de salaire par année complète de service (art. 48 : 10). */
   indemniteJoursParAn: number;
 }

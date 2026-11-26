@@ -1,12 +1,15 @@
 import type { Article } from "../types";
+import { articles2024 } from "./articles2024";
 
 /**
- * Source : loi n° 2003-044 du 28 juillet 2004 portant Code du travail (texte officiel, copie FAOLEX
- * https://faolex.fao.org/docs/pdf/mad208109.pdf). Numéros et extraits vérifiés sur ce texte.
- * ATTENTION : la loi n° 2024-014 portant nouveau Code du travail (promulguée en août 2024) abroge en principe
- * la loi 2003-044 : confirmer la date d'entrée en vigueur et les décrets d'application avant mise en production.
+ * Deux corpus :
+ *  - loi n° 2024-014 du 14 août 2024 portant Code du travail (EN VIGUEUR) : data/articles2024.ts, texte copié du texte officiel ;
+ *  - loi n° 2003-044 du 28 juillet 2004 (ANCIENNE LOI, abrogée en principe par l'art. 394 de la loi 2024-014) : ci-dessous,
+ *    source : copie FAOLEX https://faolex.fao.org/docs/pdf/mad208109.pdf. Conservée pour comparaison uniquement.
+ * Date d'entrée en vigueur de la loi 2024-014 : le texte n'en fixe pas de spécifique (art. 395 : publication au Journal officiel) -> à confirmer.
  */
-export const articles: Article[] = [
+type Ancien = Omit<Article, "loi" | "equivalent" | "theme" | "source">;
+const anciens: Ancien[] = [
   {
     id: "preavis-indemnite", numero: "18", titre: "Préavis et indemnité compensatrice de préavis (CDI)",
     texte: "Le contrat à durée indéterminée peut cesser par la volonté de l'une des parties. Cette résiliation est subordonnée à un préavis donné par la partie qui prend l'initiative de la rupture. … Sauf en cas de faute lourde, toute rupture de contrat à durée indéterminée sans préavis ou sans que le délai de préavis ait été intégralement observé, emporte obligation pour la partie responsable de la rupture de verser à l'autre partie une indemnité dont le montant correspond à la rémunération et aux avantages de toute nature dont aurait bénéficié le travailleur durant le délai de préavis qui n'aura pas été effectivement respecté. (Renvoi résumé, art. 19 : en l'absence de convention collective, un décret détermine les conditions et la durée du préavis.)",
@@ -429,5 +432,18 @@ export const articles: Article[] = [
   },
 ];
 
+/** Équivalences supplémentaires ancienne loi -> id 2024 (même sujet, certain). */
+const extras: Record<string, string> = { "faute-lourde": "l24-37", "essai-decret": "l24-53", "demission": "l24-43" };
+
+const vieux: Article[] = anciens.map((a) => ({ ...a, loi: "2003-044" as const, source: "Loi n° 2003-044 du 28 juillet 2004 (abrogée en principe), art. " + a.numero }));
+const versNouveau = new Map<string, string>(Object.entries(extras));
+for (const n of articles2024) if (n.equivalent && !versNouveau.has(n.equivalent)) versNouveau.set(n.equivalent, n.id);
+for (const a of vieux) { const n = versNouveau.get(a.id); if (n) a.equivalent = n; }
+
+export const articles2003: Article[] = vieux;
+export { articles2024 };
+/** Tous les articles (2024 puis 2003). */
+export const articles: Article[] = [...articles2024, ...vieux];
+
 export const articleParId = (id: string) => articles.find((a) => a.id === id);
-export const libelleArticle = (a: Article) => (a.numero ? `Art. ${a.numero}` : "Art. (n° à confirmer)") + " — " + a.titre;
+export const libelleArticle = (a: Article) => (a.numero ? `Art. ${a.numero}` : "Art. (n° à confirmer)") + " (" + (a.loi === "2024-014" ? "loi 2024-014" : "ancienne loi 2003-044") + ") — " + a.titre;
