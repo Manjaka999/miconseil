@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { BadgeCheck, ChevronDown, SearchX, TriangleAlert, Search, BookOpen } from "lucide-react";
 import { rechercher } from "../lib/search";
 import { libelleArticle } from "../data/articles";
 
@@ -8,18 +9,27 @@ export default function Recherche() {
   const res = useMemo(() => rechercher(q), [q]);
   return (
     <section>
-      <h2>Rechercher dans le Code du travail</h2>
-      <input className="champ" type="search" placeholder="Ex. licenciement, préavis, faute lourde, congés payés…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Recherche" />
-      <p className="muted">{res.length} résultat{res.length > 1 ? "s" : ""}</p>
-      {res.map((a) => (
-        <article key={a.id} className="carte">
-          <button className="titre" onClick={() => setOuvert(ouvert === a.id ? null : a.id)} aria-expanded={ouvert === a.id}>{libelleArticle(a)}</button>
+      <h2><BookOpen size={22} aria-hidden /> Rechercher dans le Code du travail</h2>
+      <div className="recherche">
+        <Search size={18} aria-hidden />
+        <input className="champ" type="search" placeholder="Ex. licenciement, préavis, congés payés…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Recherche" />
+      </div>
+      <p className="muted" aria-live="polite">{res.length} résultat{res.length > 1 ? "s" : ""}</p>
+      {res.map((a, i) => (
+        <article key={a.id} className="carte" style={{ ["--i" as string]: Math.min(i, 8) }}>
+          <button className="titre" onClick={() => setOuvert(ouvert === a.id ? null : a.id)} aria-expanded={ouvert === a.id}>
+            <span>{libelleArticle(a)}</span><ChevronDown size={20} aria-hidden />
+          </button>
           <p>{a.resume}</p>
-          {!a.verifie && <span className="badge">À vérifier sur le texte officiel</span>}
-          {ouvert === a.id && <p className="texte">{a.texte || "Texte intégral à insérer depuis le texte officiel de la loi n° 2003-044."}</p>}
+          {a.verifie
+            ? <span className="badge ok"><BadgeCheck size={14} aria-hidden /> Texte officiel vérifié</span>
+            : <span className="badge warn"><TriangleAlert size={14} aria-hidden /> À vérifier sur le texte officiel</span>}
+          <div className={"deplie" + (ouvert === a.id ? " ouvert" : "")}>
+            <div><p className="texte">{a.texte || "Texte intégral à insérer depuis le texte officiel."}</p></div>
+          </div>
         </article>
       ))}
-      {!res.length && <p>Aucun article trouvé. Essayez un autre mot.</p>}
+      {!res.length && <p className="muted" style={{ textAlign: "center", padding: "24px 0" }}><SearchX size={32} aria-hidden /><br />Aucun article trouvé. Essayez un autre mot.</p>}
     </section>
   );
 }

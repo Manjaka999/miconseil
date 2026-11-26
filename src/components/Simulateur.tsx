@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { Bareme, Categorie } from "../types";
 import { baremeParDefaut } from "../data/bareme";
 import { ar, calculer } from "../lib/calcul";
+import { useCountUp } from "../lib/useCountUp";
+import { Calculator } from "lucide-react";
 
 const cats: [Categorie, string][] = [["ouvrier", "Ouvrier"], ["employe", "Employé"], ["maitrise", "Agent de maîtrise"], ["cadre", "Cadre"]];
 
@@ -12,19 +14,20 @@ export default function Simulateur() {
   const [dom, setDom] = useState(3);
   const [bareme, setBareme] = useState<Bareme>(baremeParDefaut);
   const r = calculer({ salaireMensuel: salaire, ancienneteMois: anc, categorie: cat, moisDommages: dom }, bareme);
+  const aPreavis = useCountUp(r.preavis), aIndem = useCountUp(r.indemniteLicenciement), aDom = useCountUp(r.dommages), aTotal = useCountUp(r.total);
   const num = (v: string) => Math.max(0, Number(v) || 0);
   return (
     <section>
-      <h2>Simulateur de rupture</h2>
+      <h2><Calculator size={22} aria-hidden /> Simulateur de rupture</h2>
       <label className="lab">Salaire mensuel (Ar)<input className="champ" type="number" min={0} value={salaire} onChange={(e) => setSalaire(num(e.target.value))} /></label>
       <label className="lab">Ancienneté (mois)<input className="champ" type="number" min={0} value={anc} onChange={(e) => setAnc(num(e.target.value))} /></label>
       <label className="lab">Catégorie<select className="champ" value={cat} onChange={(e) => setCat(e.target.value as Categorie)}>{cats.map(([id, l]) => <option key={id} value={id}>{l}</option>)}</select></label>
       <label className="lab">Dommages-intérêts éventuels (mois de salaire, fixés par le juge)<input className="champ" type="number" min={0} value={dom} onChange={(e) => setDom(num(e.target.value))} /></label>
       <div className="resultat info">
-        <p>Préavis ({r.moisPreavis} mois) : <b>{ar(r.preavis)}</b></p>
-        <p>Indemnité de licenciement : <b>{ar(r.indemniteLicenciement)}</b></p>
-        <p>Dommages-intérêts (hypothèse) : <b>{ar(r.dommages)}</b></p>
-        <p className="total">Total estimé : {ar(r.total)}</p>
+        <div className="ligne"><span>Préavis ({r.moisPreavis} mois)</span><b>{ar(aPreavis)}</b></div>
+        <div className="ligne"><span>Indemnité de licenciement</span><b>{ar(aIndem)}</b></div>
+        <div className="ligne"><span>Dommages-intérêts (hypothèse)</span><b>{ar(aDom)}</b></div>
+        <div className="ligne"><span>Total estimé</span><span className="total">{ar(aTotal)}</span></div>
       </div>
       <details>
         <summary>Hypothèses de calcul (modifiables)</summary>
