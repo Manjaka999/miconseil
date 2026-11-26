@@ -1,4 +1,4 @@
-import type { Diagnostic, ModeleId, SituationId } from "../types";
+import type { Diagnostic, ModeleId, Profil, SituationId } from "../types";
 
 export type Verdict = Diagnostic["verdict"];
 export const verdictTexte: Record<Verdict, string> = { conforme: "Situation en règle", risque: "Attention : risque", illegal: "Pratique contraire au Code", info: "Information" };
@@ -43,6 +43,7 @@ const PROTECTION: SituationId[] = ["maladie_licenciement", "enceinte", "accident
 const RANG = [
   { n: -1, re: /^(ne signez|ne signe|ne rien signer)/ },
   { n: 0, re: /^(gard|conserv|photograph|notez|archiv|relev|sauvegard|rassembl|datez|ne signez|faites constater|consultez un medecin|prenez note|faites une copie)/ },
+  { n: 2, re: /^saisissez l'inspecteur du travail avant/ },
   { n: 4, re: /(inspect|tribunal|juridiction|conciliation|plainte|saisi)/ },
   { n: 3, re: /(ecri|courrier|mise en demeure|modele|reclam|conteste|demandez|notifi|convoqu|informe|signal|adress|envoy|proposez|exigez|remettez|reponde|faites parvenir)/ },
 ];
@@ -79,7 +80,7 @@ function regrouperEtapes(plan: Etape[]): Etape[] {
   return r;
 }
 
-export function synthetiser(items: Item[]): Synthese {
+export function synthetiser(items: Item[], profil: Profil = "salarie"): Synthese {
   const verdict = plusGrave(items.map((i) => i.diag.verdict));
   const premier = items.find((i) => i.diag.verdict === verdict)!;
 
@@ -98,7 +99,7 @@ export function synthetiser(items: Item[]): Synthese {
   if (articles.includes("l24-105")) for (let i = plan.length - 1; i >= 0; i--) if (/12 mois/.test(norm(plan[i].texte))) plan.splice(i, 1);
   // Délais : seulement ceux que fixent les articles 105 et 129 de la loi 2024-014, si le diagnostic les cite.
   const sidsCitant = (a: string) => items.filter((i) => i.diag.articles.includes(a)).map((i) => i.sid);
-  if (articles.includes("l24-105")) plan.push({ texte: "Agissez vite : l'action en paiement des salaires et accessoires de salaires, des indemnités de préavis et de licenciement se prescrit par 12 mois (art. 105). Le Code ne précise pas le point de départ : n'attendez pas.", sids: sidsCitant("l24-105"), rang: 1 });
+  if (articles.includes("l24-105")) plan.push({ texte: profil === "employeur" ? "Régularisez sans attendre : le salarié peut réclamer salaires, indemnités de préavis et de licenciement pendant 12 mois (art. 105) ; payez ce qui est dû et gardez la preuve du paiement." : "Agissez vite : l'action en paiement des salaires et accessoires de salaires, des indemnités de préavis et de licenciement se prescrit par 12 mois (art. 105). Le Code ne précise pas le point de départ : n'attendez pas.", sids: sidsCitant("l24-105"), rang: 1 });
   if (articles.includes("l24-129") && items.some((i) => i.sid === "conges")) plan.push({ texte: "Le droit au congé payé se prescrit par 3 ans, la preuve contraire restant possible (art. 129).", sids: sidsCitant("l24-129"), rang: 1 });
   const trie = regrouperEtapes(plan).map((p, i) => ({ p, i })).sort((a, b) => (a.p.rang - b.p.rang) || a.i - b.i).map((x) => x.p);
 

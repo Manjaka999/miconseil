@@ -264,3 +264,6 @@ html, body { overflow-x: hidden; }
   .page > section > :has(.resultat) { display: block !important; }
   .page > section > :has(.resultat) .resultat { display: block; }
 }
+/* Contraste du verdict « En bref » (AA) */
+.enbref.conforme .v { color: #15803d; }
+@media (prefers-color-scheme: dark) { .enbref.conforme .v { color: #4ade80; } .enbref.illegal .v { color: #f87171; } .enbref.risque .v { color: #fbbf24; } }

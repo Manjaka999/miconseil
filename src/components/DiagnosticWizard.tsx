@@ -40,7 +40,7 @@ export default function DiagnosticWizard({ onDocuments, onArticle, onSimulateur 
     const diag: Diagnostic = diagnostiquer({ profil: pr.profil, contrat: besoins[sid]?.contratImplicite ?? pr.contrat ?? "cdi", anciennete: pr.anciennete ?? -1, situation: sid, reponses: reponses[sid] ?? {} });
     return { sid, label: def.label, diag };
   }), [etage, sids, reponses, pr.profil, pr.contrat, pr.anciennete]);
-  const synthese = useMemo(() => (etage === "resultat" && multi && items.length ? synthetiser(items) : null), [etage, multi, items]);
+  const synthese = useMemo(() => (etage === "resultat" && multi && items.length ? synthetiser(items, pr.profil) : null), [etage, multi, items, pr.profil]);
   const hypotheses = [b.contrat && pr.contrat === null ? "Type de contrat non précisé : le résultat suppose un CDI." : "", b.anciennete && pr.anciennete === null ? "Ancienneté non précisée." : ""].filter(Boolean).join(" ");
   const hypothese = hypotheses ? hypotheses + " Revenez en arrière pour l'indiquer si vous le connaissez." : undefined;
   const motifDoc = items.map((i) => i.diag.titre).join(" ; ");

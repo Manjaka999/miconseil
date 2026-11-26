@@ -225,7 +225,7 @@ function calcul(s: Situation): Diagnostic {
         explication: "Les jours fériés et les jours « ponts » sont chômés et payés ; la liste annuelle limitative est fixée par décret en début d'année (art. 115). Un décret fixe aussi le taux de majoration du travail du dimanche et des jours fériés (art. 116). Employer un travailleur un jour férié en dehors des dérogations du décret annuel est puni d'une amende, après mise en demeure de l'inspecteur (art. 370).",
         articles: L(115, 116, 370),
         conseil: emp ? "Payez les jours fériés non travaillés comme des jours normaux." : "Si un jour férié n'est pas payé, vérifiez-le sur votre bulletin de paie et réclamez par écrit.",
-        etapes: ["Consultez la liste officielle des jours fériés de l'année.", "Vérifiez le bulletin de paie.", "Réclamez la régularisation par écrit si besoin (modèle « Mise en demeure »)."],
+        etapes: ["Consultez la liste officielle des jours fériés de l'année.", "Vérifiez le bulletin de paie.", emp ? "Régularisez les paies concernées et conservez les bulletins." : "Réclamez la régularisation par écrit si besoin (modèle « Mise en demeure »)."],
         documents: emp ? [] : ["mise_en_demeure"],
         nonPrecise: "Le taux de majoration du travail un jour férié ou le dimanche est fixé par décret (art. 116), pas par le Code : demandez-le à l'inspection du travail.",
       });
