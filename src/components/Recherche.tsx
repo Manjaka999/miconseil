@@ -1,12 +1,17 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BadgeCheck, ChevronDown, SearchX, TriangleAlert, Search, BookOpen } from "lucide-react";
 import { rechercher } from "../lib/search";
 import { libelleArticle } from "../data/articles";
 
-export default function Recherche() {
+export default function Recherche({ focus }: { focus?: string }) {
   const [q, setQ] = useState("");
-  const [ouvert, setOuvert] = useState<string | null>(null);
-  const res = useMemo(() => rechercher(q), [q]);
+  const [ouvert, setOuvert] = useState<string | null>(focus ?? null);
+  const res = useMemo(() => {
+    const r = rechercher(q);
+    // Article demandé depuis un diagnostic : affiché en premier.
+    return focus && !q ? [...r.filter((a) => a.id === focus), ...r.filter((a) => a.id !== focus)] : r;
+  }, [q, focus]);
+  useEffect(() => { if (focus) window.scrollTo({ top: 0 }); }, [focus]);
   return (
     <section>
       <h2><BookOpen size={22} aria-hidden /> Rechercher dans le Code du travail</h2>
