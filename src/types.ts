@@ -70,3 +70,6 @@ export interface Bareme {
   /** Jours de salaire par année complète de service (art. 48 : 10). */
   indemniteJoursParAn: number;
 }
+
+/** Informations de profil réellement utilisées par une situation (le reste n'est pas demandé). */
+export interface Besoin { contrat?: boolean; anciennete?: boolean; contratImplicite?: Contrat }

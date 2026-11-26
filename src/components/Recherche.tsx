@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { BadgeCheck, ChevronDown, SearchX, TriangleAlert, Search, BookOpen, Archive, ArrowLeftRight } from "lucide-react";
+import { BadgeCheck, ChevronDown, SearchX, TriangleAlert, Search, BookOpen, Archive, ArrowLeftRight, Compass, ArrowLeft } from "lucide-react";
+import type { SituationId } from "../types";
+import { carteArticles } from "../lib/articleSituations";
+import { situations } from "../data/situations";
 import { rechercher, type Filtre } from "../lib/search";
 import { articleParId, libelleArticle } from "../data/articles";
 import BandeauLoi from "./BandeauLoi";
@@ -11,7 +14,9 @@ const onglets: { v: Filtre; label: string }[] = [
   { v: "tous", label: "Les deux" },
 ];
 
-export default function Recherche({ focus }: { focus?: string }) {
+export default function Recherche({ focus, onDiagnostic, retour }: { focus?: string; onDiagnostic: (sid: SituationId) => void; retour?: () => void }) {
+  const [carte, setCarte] = useState<Record<string, SituationId>>({});
+  useEffect(() => { carteArticles().then(setCarte).catch(() => {}); }, []);
   const [q, setQ] = useState("");
   const [filtre, setFiltre] = useState<Filtre>("2024-014");
   const [ouvert, setOuvert] = useState<string | null>(focus ?? null);
@@ -40,6 +45,7 @@ export default function Recherche({ focus }: { focus?: string }) {
   return (
     <section>
       <h2><BookOpen size={22} aria-hidden /> Rechercher dans le Code du travail</h2>
+      {retour && <button className="btn sec" onClick={retour}><ArrowLeft size={18} aria-hidden /> Retour à mon diagnostic</button>}
       <BandeauLoi />
       <div className="grille onglets-loi" role="group" aria-label="Loi à consulter">
         {onglets.map((o) => <button key={o.v} className={"choix" + (filtre === o.v ? " on" : "")} aria-pressed={filtre === o.v} onClick={() => choisir(o.v)}>{o.label}</button>)}
@@ -68,6 +74,7 @@ export default function Recherche({ focus }: { focus?: string }) {
                 : <span className="badge warn"><TriangleAlert size={14} aria-hidden /> À vérifier sur le texte officiel</span>}
               {a.theme && <span className="badge theme">{a.theme}</span>}
             </div>
+            {carte[a.id] && <button className="lien" onClick={() => onDiagnostic(carte[a.id])}><Compass size={14} aria-hidden /> Faire un diagnostic sur ce sujet : {situations.find((s) => s.id === carte[a.id])?.label}</button>}
             {eq && <button className="lien" onClick={() => versEquivalent(eq.id)}><ArrowLeftRight size={14} aria-hidden /> {ancien ? `Équivalent dans la loi 2024-014 : art. ${eq.numero}` : `Équivalent dans l'ancienne loi : art. ${eq.numero}`}</button>}
             <div className={"deplie" + (ouvert === a.id ? " ouvert" : "")}>
               <div><p className="texte">{a.texte || "Texte intégral à insérer depuis le texte officiel."}</p>{a.source && <p className="muted">Source : {a.source}</p>}</div>

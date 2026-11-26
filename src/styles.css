@@ -69,7 +69,7 @@ details { margin: 14px 0; border: 1px solid var(--bord); border-radius: 12px; pa
 .avertissement { display: flex; gap: 8px; align-items: flex-start; margin: 20px 4px 0; font-size: .8rem; color: var(--gris); } .avertissement svg { flex: none; margin-top: 2px; }
 
 /* Barre d'onglets */
-.tabs { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: min(calc(100% - 20px), 740px); display: grid; grid-template-columns: repeat(4, 1fr); background: color-mix(in srgb, var(--carte) 88%, transparent); backdrop-filter: blur(14px); border: 1px solid var(--bord); border-radius: 20px; box-shadow: 0 12px 32px -10px rgba(15,23,42,.35); padding: 6px; }
+.tabs { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: min(calc(100% - 20px), 740px); display: grid; grid-template-columns: repeat(var(--n, 5), 1fr); background: color-mix(in srgb, var(--carte) 88%, transparent); backdrop-filter: blur(14px); border: 1px solid var(--bord); border-radius: 20px; box-shadow: 0 12px 32px -10px rgba(15,23,42,.35); padding: 6px; }
 .indicateur { position: absolute; top: 6px; bottom: 6px; left: 6px; width: calc((100% - 12px) / 4); border-radius: 14px; background: var(--bleu-clair); transform: translateX(calc(var(--i, 0) * 100%)); transition: transform .45s var(--ease); }
 .tabs button { position: relative; background: none; border: 0; padding: 8px 4px; font: inherit; font-size: .72rem; color: var(--gris); display: flex; flex-direction: column; align-items: center; gap: 3px; min-height: 56px; cursor: pointer; transition: color .25s, transform .2s var(--ease); }
 .tabs button:active { transform: scale(.94); } .tabs .on { color: var(--bleu); font-weight: 700; }
@@ -140,3 +140,93 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .badge.loi { background: var(--bleu-clair); color: var(--bleu-fonce); } .badge.ancienne { background: #fee2e2; color: #991b1b; } .badge.theme { background: var(--bord); color: var(--txt); font-weight: 500; }
 .carte.ancien { border-left: 4px solid #f87171; }
 @media (prefers-color-scheme: dark) { .badge.loi { color: #bfdbfe; } .badge.ancienne { background: #4c1d1d; color: #fecaca; } }
+
+/* ===== Version 2 : accueil, plan d'action, lexique, accessibilité, impression ===== */
+:root { --gris: #566478; }
+@media (prefers-color-scheme: dark) { :root { --gris: #a3b1c8; } }
+.skip { position: absolute; left: -999px; top: 8px; z-index: 100; background: var(--bleu-fonce); color: #fff; padding: 10px 14px; border-radius: 10px; }
+.skip:focus { left: 8px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.page:focus { outline: none; }
+a:focus-visible, .terme:focus-visible, .tuile:focus-visible, .seg:focus-visible, .reprise:focus-visible, input[type="checkbox"]:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Onglets : nombre variable */
+.tabs { grid-template-columns: repeat(var(--n, 5), 1fr); }
+.indicateur { width: calc((100% - 12px) / var(--n, 5)); }
+.tabs button { min-width: 0; padding-inline: 1px; } .tabs button span { font-size: .66rem; }
+@media (max-width: 400px) { .tabs button span { font-size: .6rem; } }
+@media (min-width: 1040px) { .tabs { grid-template-columns: 1fr; } .tabs button span { font-size: .95rem; } .indicateur { width: auto; } }
+
+/* Cibles tactiles >= 44 px */
+.lien { min-height: 44px; display: inline-flex; align-items: center; gap: 4px; }
+.lien-art { min-height: 32px; }
+.titre { min-height: 44px; }
+.deplie > div { visibility: hidden; transition: visibility 0s .35s; } .deplie.ouvert > div { visibility: visible; transition-delay: 0s; }
+
+/* Accueil */
+.accueil h3 { margin: 20px 0 8px; font-size: 1rem; }
+.globale { position: relative; margin-bottom: 12px; }
+.resultats-globaux { margin-top: 8px; border: 1px solid var(--bord); border-radius: 12px; padding: 4px 14px 10px; background: var(--carte); }
+.resultats-globaux ul { list-style: none; margin: 0; padding: 0; } .resultats-globaux h4 { margin: 10px 0 0; }
+.raccourcis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 8px 0; }
+.tuile { display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 14px; min-height: 84px; border: 2px solid var(--bord); border-radius: 14px; background: var(--carte); color: inherit; font: inherit; cursor: pointer; transition: transform .2s var(--ease), border-color .2s; }
+.tuile:hover { transform: translateY(-2px); border-color: var(--bleu); } .tuile strong { color: var(--bleu); } .tuile span { font-size: .82rem; color: var(--gris); }
+.tuile.multi { border-color: var(--bleu); background: var(--bleu-clair); }
+.reprise { display: flex; gap: 10px; align-items: center; width: 100%; margin: 12px 0 0; padding: 12px 14px; min-height: 52px; border: 2px dashed var(--bleu); border-radius: 14px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.segment { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0; }
+.segment-lab { display: inline-flex; align-items: center; gap: 4px; color: var(--gris); font-size: .9rem; }
+.seg { min-height: 44px; padding: 8px 16px; border: 2px solid var(--bord); border-radius: 999px; background: var(--carte); color: inherit; font: inherit; cursor: pointer; }
+.seg.on { border-color: var(--bleu); background: var(--bleu-clair); font-weight: 700; }
+.mode .choix { min-height: 48px; } .ligne-champ { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; } .ligne-champ .champ { margin: 0; }
+.barre-actions { position: sticky; bottom: 84px; background: color-mix(in srgb, var(--carte) 92%, transparent); padding: 8px 0; z-index: 5; }
+@media (min-width: 1040px) { .barre-actions { bottom: 0; } }
+
+/* Résultat : « En bref », plan d'action */
+.enbref { border-radius: 12px; padding: 14px 16px; background: color-mix(in srgb, var(--bleu-clair) 55%, var(--carte)); border: 1px solid var(--bord); }
+.enbref h3 { margin: 4px 0 6px; } .enbref-tag { display: flex; align-items: center; gap: 6px; margin: 4px 0; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--bleu); }
+.enbref .v { font-weight: 700; } .enbref.illegal .v { color: var(--ko); } .enbref.risque .v { color: #b45309; } .enbref.conforme .v { color: var(--ok); }
+.maintenant { margin: 4px 0 0; padding-left: 20px; } .maintenant li { margin: 4px 0; }
+.hypothese { display: flex; gap: 6px; align-items: flex-start; margin: 10px 0 0; }
+.plan h4 { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; } .compteur { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--bleu); }
+.cases { list-style: none; padding: 0 !important; margin: 6px 0; }
+.cases li { position: relative; margin: 6px 0; border: 1px solid var(--bord); border-radius: 12px; background: var(--carte); }
+.cases input { position: absolute; left: 12px; top: 14px; width: 22px; height: 22px; accent-color: var(--bleu); cursor: pointer; }
+.cases label { display: flex; gap: 10px; padding: 12px 12px 12px 46px; min-height: 48px; cursor: pointer; align-items: flex-start; }
+.cases .num { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--bleu); color: #fff; font-size: .78rem; font-weight: 700; }
+.cases li.fait { background: color-mix(in srgb, var(--ok) 10%, var(--carte)); } .cases li.fait label > span:last-child { text-decoration: line-through; color: var(--gris); }
+.etiquettes { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; } .etiquette { background: var(--bord); border-radius: 999px; padding: 1px 8px; color: var(--txt); font-size: .72rem; }
+.detail { margin: 14px 0; } .detail h4:first-of-type { margin-top: 8px; }
+.points { padding-left: 18px; } .points li.illegal { border-left: 3px solid var(--ko); padding-left: 8px; list-style: none; margin-left: -18px; } .points li.risque { border-left: 3px solid var(--warn); padding-left: 8px; list-style: none; margin-left: -18px; }
+.badge { background: var(--bord); color: var(--txt); }
+.badge.ok { background: #dcfce7; color: #166534; } .badge.warn { background: #fef3c7; color: #92400e; } .badge.loi { background: var(--bleu-clair); color: var(--bleu-fonce); } .badge.ancienne { background: #fee2e2; color: #991b1b; }
+
+/* Mots du lexique et fenêtre de définition */
+.terme { background: none; border: 0; border-bottom: 2px dotted var(--bleu); padding: 0 1px; min-height: 0; font: inherit; color: inherit; cursor: help; }
+.terme[aria-expanded="true"], .terme:hover { background: var(--bleu-clair); }
+.popover { position: fixed; z-index: 60; left: 12px; right: 12px; bottom: 88px; max-width: 520px; margin-inline: auto; background: var(--carte); color: var(--txt); border: 2px solid var(--bleu); border-radius: 14px; padding: 12px 14px 8px; box-shadow: 0 16px 40px -12px rgba(15,23,42,.5); animation: monte .25s var(--ease) both; }
+.popover p { margin: 6px 0; font-size: .92rem; } .pop-tete { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pop-tete strong { display: flex; align-items: center; gap: 6px; } .pop-x { width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: none; color: inherit; cursor: pointer; border-radius: 10px; }
+@media (min-width: 1040px) { .popover { left: auto; right: 24px; bottom: 24px; width: 420px; } }
+.lex .carte { margin: 8px 0; }
+
+/* Simulateur / documents */
+.oblig { color: #b45309; } .aide { display: block; margin-top: 4px; color: var(--gris); font-weight: 400; line-height: 1.4; }
+.ligne2 { border-bottom: 1px dashed var(--bord); padding: 4px 0 8px; } .ligne2 .ligne { border: 0; padding-bottom: 0; } .ligne2.inactive { opacity: .8; } .ligne2.inactive .ligne b { font-weight: 500; }
+.doc-lab { margin: 14px 0; } .doc-lab > span { display: flex; align-items: center; gap: 6px; }
+.doc { font-size: .9rem; margin-top: 6px; resize: vertical; }
+.print-zone { display: none; }
+@media (min-width: 760px) {
+  .docs > .doc-lab { grid-column: 2; grid-row: 3 / span 9; align-self: start; margin-top: 12px; } .docs > .doc-lab .doc { height: 100%; min-height: 380px; }
+  .docs > .actions { grid-column: 2; }
+  .docs > p.muted { grid-column: 2; }
+}
+
+/* Impression : on n'imprime que le récapitulatif ou le document, sans barre ni boutons */
+@media print {
+  body { background: #fff; color: #000; }
+  .side, .skip, .tabs, .no-print, .popover, .page > section > *:not(.print-zone), .bandeau { display: none !important; }
+  .page { margin: 0; padding: 0; animation: none; } .app { display: block; max-width: none; padding: 0; }
+  section { box-shadow: none; border: 0; padding: 0; display: block; }
+  .print-zone { display: block !important; white-space: pre-wrap; font: 12pt/1.5 Georgia, "Times New Roman", serif; margin: 0; }
+  .avertissement { color: #000; font-size: 9pt; margin-top: 24px; }
+}

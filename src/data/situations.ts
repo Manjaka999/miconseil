@@ -1,4 +1,4 @@
-import type { SituationDef, Theme } from "../types";
+import type { Besoin, SituationDef, SituationId, Theme } from "../types";
 
 export const themes: [Theme, string][] = [
   ["rupture", "Rupture du contrat"],
@@ -75,4 +75,20 @@ export const situations: SituationDef[] = [
   { id: "teletravail", theme: "contrats", label: "Télétravail (travail à distance)", motsCles: ["télétravail", "travail à distance", "domicile", "matériel", "épidémie", "internet"] },
   { id: "modification_contrat", theme: "contrats", label: "Modification du contrat (salaire, poste, classification)", motsCles: ["baisse de salaire", "changement de poste", "rétrogradation", "avenant", "mutation", "prise d'acte"] },
   { id: "chomage_technique", theme: "contrats", label: "Chômage technique", motsCles: ["arrêt d'activité", "panne", "sinistre", "pénurie", "mise en chômage", "suspension collective"] },
+];
+
+/** Profil utile par situation : le type de contrat ou l'ancienneté ne sont demandés que si le diagnostic en dépend. */
+export const besoins: Partial<Record<SituationId, Besoin>> = {
+  licencier: { contrat: true }, eco: { contrat: true }, demission: { contrat: true }, enceinte: { contrat: true },
+  conges: { anciennete: true }, essai: { contratImplicite: "essai", anciennete: true }, cdd_requalif: { contratImplicite: "cdd", anciennete: true },
+};
+
+/** Raccourcis de la page d'accueil : les cas les plus fréquents. */
+export const raccourcis: { id: SituationId; label: string; aide: string }[] = [
+  { id: "licencier", label: "Licenciement", aide: "On me renvoie, ou je veux licencier" },
+  { id: "retard_salaire", label: "Salaire impayé", aide: "Retard ou non-paiement" },
+  { id: "conges", label: "Congés", aide: "Refusés, non payés ou non pris" },
+  { id: "demission", label: "Démission", aide: "Partir ou recevoir une démission" },
+  { id: "harcelement", label: "Harcèlement", aide: "Moral ou discrimination" },
+  { id: "enceinte", label: "Grossesse", aide: "Maternité, allaitement" },
 ];

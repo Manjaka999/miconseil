@@ -1,1 +1,4 @@
-{ "rewrites": [{ "source": "/((?!assets/|sw.js|manifest.webmanifest|icon.svg).*)", "destination": "/index.html" }] }
+{
+  "redirects": [{ "source": "/favicon.ico", "destination": "/icon.svg", "permanent": false }],
+  "rewrites": [{ "source": "/((?!assets/|sw.js|manifest.webmanifest|icon.svg|favicon.ico).*)", "destination": "/index.html" }]
+}
