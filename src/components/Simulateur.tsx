@@ -28,7 +28,7 @@ export default function Simulateur() {
       </div>
       <details>
         <summary>Hypothèses de calcul (modifiables)</summary>
-        <p className="muted">Valeurs par défaut issues de sources secondaires, parfois contradictoires : validez-les sur le texte officiel.</p>
+        <p className="muted">Indemnité de licenciement : art. 28 de la loi 2003-044 (10 jours par année, plafond 6 mois, licenciement économique). Durées de préavis : non fixées par le Code (convention collective ou décret) ; valeurs indicatives à vérifier.</p>
         {cats.map(([id, l]) => (
           <label key={id} className="lab">Préavis {l} (mois)<input className="champ" type="number" min={0} value={bareme.preavisMois[id]} onChange={(e) => setBareme({ ...bareme, preavisMois: { ...bareme.preavisMois, [id]: num(e.target.value) } })} /></label>
         ))}

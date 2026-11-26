@@ -13,6 +13,7 @@ export function calculer(e: Entree, b: Bareme): Resultat {
     jours += Math.max(0, Math.min(annees, t.jusqua) - debut) * t.joursParAn;
     debut = t.jusqua;
   }
+  jours = Math.min(jours, 180); // plafond de 6 mois de salaire (art. 28)
   const indemniteLicenciement = Math.round((e.salaireMensuel / 30) * jours);
   const dommages = Math.round(e.salaireMensuel * Math.max(0, e.moisDommages));
   return { preavis, indemniteLicenciement, dommages, total: preavis + indemniteLicenciement + dommages, moisPreavis };
