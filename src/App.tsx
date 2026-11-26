@@ -18,6 +18,7 @@ export default function App() {
   const index = onglets.findIndex((o) => o.id === onglet);
   return (
     <div className="app">
+      <aside className="side">
       <header className="hero">
         <div className="hero-inner">
           <span className="logo" aria-hidden><Scale size={26} strokeWidth={2.2} /></span>
@@ -27,6 +28,16 @@ export default function App() {
           </div>
         </div>
       </header>
+      <nav className="tabs" aria-label="Navigation principale" style={{ ["--i" as string]: index }}>
+        <span className="indicateur" aria-hidden />
+        {onglets.map(({ id, label, Icon }) => (
+          <button key={id} className={id === onglet ? "on" : ""} onClick={() => setOnglet(id)} aria-current={id === onglet ? "page" : undefined}>
+            <Icon size={22} strokeWidth={id === onglet ? 2.4 : 1.9} aria-hidden />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
+      </aside>
       <main key={onglet} className="page">
         {onglet === "recherche" && <Recherche />}
         {onglet === "diagnostic" && <DiagnosticWizard onDocuments={() => setOnglet("documents")} />}
@@ -37,15 +48,6 @@ export default function App() {
           <span>Outil d'information générale : il ne remplace pas un avis juridique. Vérifiez toujours le texte en vigueur auprès de l'inspection du travail.</span>
         </p>
       </main>
-      <nav className="tabs" aria-label="Navigation principale" style={{ ["--i" as string]: index }}>
-        <span className="indicateur" aria-hidden />
-        {onglets.map(({ id, label, Icon }) => (
-          <button key={id} className={id === onglet ? "on" : ""} onClick={() => setOnglet(id)} aria-current={id === onglet ? "page" : undefined}>
-            <Icon size={22} strokeWidth={id === onglet ? 2.4 : 1.9} aria-hidden />
-            <span>{label}</span>
-          </button>
-        ))}
-      </nav>
     </div>
   );
 }

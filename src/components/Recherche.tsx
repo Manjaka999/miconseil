@@ -15,6 +15,7 @@ export default function Recherche() {
         <input className="champ" type="search" placeholder="Ex. licenciement, préavis, congés payés…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Recherche" />
       </div>
       <p className="muted" aria-live="polite">{res.length} résultat{res.length > 1 ? "s" : ""}</p>
+      <div className="liste">
       {res.map((a, i) => (
         <article key={a.id} className="carte" style={{ ["--i" as string]: Math.min(i, 8) }}>
           <button className="titre" onClick={() => setOuvert(ouvert === a.id ? null : a.id)} aria-expanded={ouvert === a.id}>
@@ -29,6 +30,7 @@ export default function Recherche() {
           </div>
         </article>
       ))}
+      </div>
       {!res.length && <p className="muted" style={{ textAlign: "center", padding: "24px 0" }}><SearchX size={32} aria-hidden /><br />Aucun article trouvé. Essayez un autre mot.</p>}
     </section>
   );

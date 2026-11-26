@@ -18,7 +18,7 @@ export default function Documents() {
     try { await navigator.clipboard.writeText(texte); setCopie(true); setTimeout(() => setCopie(false), 2000); } catch { /* copie manuelle possible */ }
   };
   return (
-    <section>
+    <section className="duo docs">
       <h2><FileText size={22} aria-hidden /> Documents prêts à l'emploi</h2>
       <div className="grille">{modeles.map(([id, l]) => <button key={id} className={"choix" + (modele === id ? " on" : "")} onClick={() => setModele(id)}>{l}</button>)}</div>
       {f("employeur", "Employeur")}{f("salarie", "Salarié")}{f("lieu", "Lieu")}{f("date", "Date")}

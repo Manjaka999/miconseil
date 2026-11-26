@@ -17,7 +17,7 @@ export default function Simulateur() {
   const aPreavis = useCountUp(r.preavis), aIndem = useCountUp(r.indemniteLicenciement), aDom = useCountUp(r.dommages), aTotal = useCountUp(r.total);
   const num = (v: string) => Math.max(0, Number(v) || 0);
   return (
-    <section>
+    <section className="duo sim">
       <h2><Calculator size={22} aria-hidden /> Simulateur de rupture</h2>
       <label className="lab">Salaire mensuel (Ar)<input className="champ" type="number" min={0} value={salaire} onChange={(e) => setSalaire(num(e.target.value))} /></label>
       <label className="lab">Ancienneté (mois)<input className="champ" type="number" min={0} value={anc} onChange={(e) => setAnc(num(e.target.value))} /></label>
